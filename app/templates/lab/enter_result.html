@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Enter Result - {{ item.test.test_name }}{% endblock %}
+{% block page_title %}Lab Result Entry{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 bg-white d-flex justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Result Details</h6>
+                <span class="badge bg-secondary">ORD-{{ item.order.id }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <strong>Patient:</strong> {{ item.order.patient.name }} ({{ item.order.patient.patient_code
+                        }})<br>
+                        <strong>Gender:</strong> {{ item.order.patient.gender or 'N/A' }}<br>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <strong>Test:</strong> {{ item.test.test_name }}<br>
+                        <strong>Category:</strong> {{ item.test.category.name if item.test.category else 'N/A' }}
+                    </div>
+                </div>
+
+                <hr>
+
+                <form method="POST" action="{{ url_for('frontend.enter_result', item_id=item.id) }}">
+                    <div class="mb-3">
+                        <label for="result_text" class="form-label fw-bold">Test Result <span
+                                class="text-danger">*</span></label>
+                        <textarea class="form-control" id="result_text" name="result_text" rows="5" required
+                            placeholder="Enter the final test result or finding here...">{{ item.result.result_text if item.result else '' }}</textarea>
+                        <small class="text-muted">Please include units and reference ranges if applicable.</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('frontend.pending_lab_work') }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Save
+                            Result</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

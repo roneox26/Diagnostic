@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Report - Akash</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; font-size: 12px; line-height: 1.4; color: #333; }
+        
+        .header {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 4px solid #10b981;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(45deg, #ffffff, #f0fdf4);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 28px;
+            color: #059669;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .clinic-info h1 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .clinic-info .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .clinic-info .address {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .contact-info {
+            text-align: right;
+            font-size: 11px;
+        }
+        
+        .patient-info {
+            display: flex;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+        }
+        
+        .patient-details {
+            flex: 1;
+            padding: 15px;
+        }
+        
+        .patient-qr {
+            width: 120px;
+            padding: 15px;
+            text-align: center;
+            border-left: 1px solid #e2e8f0;
+            background: white;
+        }
+        
+        .qr-code {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(45deg, #ffffff, #f0fdf4);
+            border: 3px solid #10b981;
+            border-radius: 12px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #059669;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        }
+        
+        .report-meta {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .meta-item {
+            font-size: 11px;
+        }
+        
+        .meta-label {
+            color: #64748b;
+            font-weight: bold;
+        }
+        
+        .report-title {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 900;
+            margin: 25px 0;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+        
+        .test-results {
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+        }
+        
+        .test-header {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            padding: 12px 20px;
+            border-bottom: 2px solid #10b981;
+            font-weight: bold;
+            color: #047857;
+            font-size: 14px;
+        }
+        
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .test-table th {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #10b981;
+            font-weight: bold;
+            color: #047857;
+            font-size: 13px;
+        }
+        
+        .test-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .test-name {
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .test-result {
+            font-weight: bold;
+            color: #047857;
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        
+        .reference-range {
+            color: #6b7280;
+            font-size: 11px;
+        }
+        
+        .notes-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+        
+        .notes-title {
+            color: #92400e;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 20px;
+        }
+        
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .signature {
+            text-align: center;
+            width: 200px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #374151;
+            margin-bottom: 5px;
+            height: 40px;
+        }
+        
+        .signature-title {
+            font-weight: bold;
+            color: #374151;
+        }
+        
+        .signature-subtitle {
+            font-size: 10px;
+            color: #6b7280;
+        }
+        
+        .footer-info {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+        
+        .generation-info {
+            font-size: 10px;
+        }
+        
+        @media print {
+            body { font-size: 11px; }
+            .header::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🏥</div>
+                <div class="clinic-info">
+                    <h1>MEDCARE DIAGNOSTIC CENTER</h1>
+                    <div class="tagline">🔬 Precision | Excellence | Trust</div>
+                    <div class="address">123 Medical Plaza, Healthcare District, Dhaka - 1205</div>
+                </div>
+            </div>
+            <div class="contact-info">
+                📞 +880-1234-567890<br>
+                📧 info@medcare.com<br>
+                🌐 www.medcare.com
+            </div>
+        </div>
+    </div>
+
+    <div class="patient-info">
+        <div class="patient-details">
+            <div style="color: #047857; margin-bottom: 10px;">Akash</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div><strong>Age:</strong> 
+                    
+                        N/A
+                     Years
+                </div>
+                <div><strong>Gender:</strong> Male</div>
+                <div><strong>Patient ID:</strong> PT-0001</div>
+                <div><strong>Phone:</strong> 01818266498</div>
+            </div>
+            
+        </div>
+        <div class="patient-qr">
+            <div class="qr-code">QR CODE</div>
+            <div style="font-size: 10px; color: #64748b;">Scan for Digital Report</div>
+        </div>
+    </div>
+
+    <div class="report-meta">
+        <div class="meta-grid">
+            <div class="meta-item">
+                <div class="meta-label">REGISTERED ON:</div>
+                <div>07:44 PM 06 Mar, 2026</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">SAMPLE COLLECTED:</div>
+                <div>07:44 PM 06 Mar, 2026</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">REPORTED ON:</div>
+                <div>07:44 PM 06 Mar, 2026</div>
+            </div>
+        </div>
+    </div>
+
+    
+    
+    <div class="report-title">TEST</div>
+    
+    <div class="test-results">
+        <div class="test-header">Test Results</div>
+        <table class="test-table">
+            <thead>
+                <tr>
+                    <th style="width: 40%;">Parameter</th>
+                    <th style="width: 25%;">Result</th>
+                    <th style="width: 25%;">Reference Range</th>
+                    <th style="width: 10%;">Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="test-name">Test</td>
+                    <td class="test-result">Good</td>
+                    <td class="reference-range">Normal Range</td>
+                    <td>test</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    
+    
+    
+
+    <div class="notes-section">
+        <div class="notes-title">⚠️ Important Notes:</div>
+        <div>
+            • This report is generated electronically and is valid without signature.<br>
+            • Please consult your physician for proper interpretation of results.<br>
+            • Report should be correlated with clinical findings.
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="signatures">
+            <div class="signature">
+                <div class="signature-line"></div>
+                <div class="signature-title">Lab Technician</div>
+                <div class="signature-subtitle">(BMLT, DMLT)</div>
+            </div>
+            <div class="signature">
+                <div class="signature-line"></div>
+                <div class="signature-title">Dr. Medical Officer</div>
+                <div class="signature-subtitle">(MD, Pathologist)</div>
+            </div>
+            <div class="signature">
+                <div class="signature-line"></div>
+                <div class="signature-title">Dr. Chief Pathologist</div>
+                <div class="signature-subtitle">(MD, Chief Pathologist)</div>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <div>🙏 Thank you for choosing MedCare Diagnostic Center</div>
+            <div class="generation-info">
+                Generated on: 06 Mar, 2026 07:44 PM | Page 1 of 1
+            </div>
+        </div>
+    </div>
+</body>
+</html>

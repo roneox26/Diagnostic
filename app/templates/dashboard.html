@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Advanced Healthcare Diagnostics{% endblock %}
+{% block page_title %}Healthcare Dashboard{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+        <i class="fas fa-sync-alt"></i> Refresh
+    </button>
+    <div class="dropdown">
+        <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-plus"></i> Quick Actions
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('frontend.add_patient') }}"><i class="fas fa-user-plus me-2"></i>Add Patient</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('frontend.new_order') }}"><i class="fas fa-clipboard-list me-2"></i>New Order</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('appointments.book_appointment') }}"><i class="fas fa-calendar-plus me-2"></i>Book Appointment</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Enhanced Stats Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-white-50 text-uppercase small fw-bold mb-1">Today's Patients</div>
+                        <div class="h2 fw-bold mb-0">{{ today_patients }}</div>
+                        <div class="small text-white-50">
+                            <i class="fas fa-arrow-up me-1"></i>12% from yesterday
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                        <i class="fas fa-users fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-white-50 text-uppercase small fw-bold mb-1">Tests Completed</div>
+                        <div class="h2 fw-bold mb-0">{{ today_tests }}</div>
+                        <div class="small text-white-50">
+                            <i class="fas fa-arrow-up me-1"></i>8% from yesterday
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                        <i class="fas fa-flask fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #8b4513;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted text-uppercase small fw-bold mb-1">Pending Reports</div>
+                        <div class="h2 fw-bold mb-0">{{ pending_reports }}</div>
+                        <div class="small text-muted">
+                            <i class="fas fa-clock me-1"></i>Awaiting results
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-50 rounded-circle p-3">
+                        <i class="fas fa-hourglass-half fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #2d5a87;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted text-uppercase small fw-bold mb-1">Today's Revenue</div>
+                        <div class="h2 fw-bold mb-0">৳{{ "%.0f"|format(revenue) }}</div>
+                        <div class="small text-muted">
+                            <i class="fas fa-chart-line me-1"></i>Daily earnings
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-50 rounded-circle p-3">
+                        <i class="fas fa-coins fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Row -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold text-dark">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>Recent Activity
+                    </h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <input type="radio" class="btn-check" name="timeRange" id="today" checked>
+                        <label class="btn btn-outline-primary" for="today">Today</label>
+                        <input type="radio" class="btn-check" name="timeRange" id="week">
+                        <label class="btn btn-outline-primary" for="week">Week</label>
+                        <input type="radio" class="btn-check" name="timeRange" id="month">
+                        <label class="btn btn-outline-primary" for="month">Month</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center p-3 bg-light rounded">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-user-plus text-primary"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">New Patients</div>
+                                <div class="text-muted small">{{ today_patients }} today</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center p-3 bg-light rounded">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-vial text-success"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">Samples Collected</div>
+                                <div class="text-muted small">{{ today_tests }} samples</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center p-3 bg-light rounded">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-file-medical text-info"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">Reports Generated</div>
+                                <div class="text-muted small">{{ today_tests - pending_reports }} reports</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="card-title mb-0 fw-bold text-dark">
+                    <i class="fas fa-bell text-warning me-2"></i>Notifications
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small">{{ pending_reports }} reports pending</div>
+                        <div class="text-muted small">Lab results awaiting approval</div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="fas fa-calendar text-info"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small">5 appointments today</div>
+                        <div class="text-muted small">Scheduled for sample collection</div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small">System running smoothly</div>
+                        <div class="text-muted small">All services operational</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Recent Orders Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold text-dark">
+                        <i class="fas fa-clipboard-list text-primary me-2"></i>Recent Orders
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-filter me-1"></i>Filter
+                        </button>
+                        <a href="{{ url_for('frontend.orders_list') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>View All
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 px-4 py-3 fw-bold text-dark">Order ID</th>
+                                <th class="border-0 py-3 fw-bold text-dark">Patient</th>
+                                <th class="border-0 py-3 fw-bold text-dark">Date & Time</th>
+                                <th class="border-0 py-3 fw-bold text-dark">Status</th>
+                                <th class="border-0 py-3 fw-bold text-dark">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for o in recent_orders %}
+                            <tr class="border-bottom">
+                                <td class="px-4 py-3">
+                                    <div class="fw-bold text-primary">ORD-{{ "%04d"|format(o.id) }}</div>
+                                    <div class="small text-muted">{{ o.uuid[:8] if o.uuid else 'N/A' }}</div>
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">{{ o.patient.name }}</div>
+                                            <div class="small text-muted">ID: {{ o.patient.id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <div class="fw-bold">{{ o.order_date.strftime('%d %b %Y') }}</div>
+                                    <div class="small text-muted">{{ o.order_date.strftime('%I:%M %p') }}</div>
+                                </td>
+                                <td class="py-3">
+                                    {% if o.status == 'pending' %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
+                                        <i class="fas fa-clock me-1"></i>Pending Sample
+                                    </span>
+                                    {% elif o.status == 'sample_collected' %}
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2">
+                                        <i class="fas fa-flask me-1"></i>In Lab
+                                    </span>
+                                    {% elif o.status == 'completed' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                                        <i class="fas fa-check-circle me-1"></i>Completed
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2">
+                                        {{ o.status|title }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ url_for('frontend.view_order', order_id=o.id) }}" 
+                                           class="btn btn-outline-primary btn-sm" 
+                                           title="View Details"
+                                           data-bs-toggle="tooltip">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        
+                                        {% if o.status == 'pending' %}
+                                        <form action="{{ url_for('frontend.collect_sample', order_id=o.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" 
+                                                    class="btn btn-outline-warning btn-sm" 
+                                                    title="Collect Sample"
+                                                    data-bs-toggle="tooltip">
+                                                <i class="fas fa-syringe"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+
+                                        {% if o.status in ['sample_collected', 'completed'] %}
+                                        <a href="{{ url_for('reports.download_report', order_id=o.id) }}" 
+                                           class="btn btn-outline-success btn-sm" 
+                                           title="Download Report"
+                                           data-bs-toggle="tooltip">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
+                                        <div class="h5">No recent orders found</div>
+                                        <div class="small">Orders will appear here once they are created</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshDashboard() {
+    location.reload();
+}
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

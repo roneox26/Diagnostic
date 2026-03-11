@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Details - Diagnostic Software{% endblock %}
+{% block page_title %}Order Details: ORD-{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Patient Information</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ order.patient.name }}</p>
+                <p><strong>Code:</strong> {{ order.patient.patient_code }}</p>
+                <p><strong>Gender:</strong> {{ order.patient.gender }}</p>
+                <p><strong>Phone:</strong> {{ order.patient.phone }}</p>
+                <hr>
+                <p><strong>Order Date:</strong> {{ order.order_date.strftime('%Y-%m-%d %I:%M %p') }}</p>
+                <p><strong>Status:</strong> 
+                    {% if order.status == 'pending' %}
+                    <span class="badge bg-warning text-dark">Pending Sample</span>
+                    {% elif order.status == 'sample_collected' %}
+                    <span class="badge bg-primary">In Lab</span>
+                    {% elif order.status == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ order.status }}</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Tests in this Order</h6>
+                <div>
+                    {% if order.status == 'pending' %}
+                    <form action="{{ url_for('frontend.collect_sample', order_id=order.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-warning">
+                            <i class="fas fa-syringe me-1"></i> Collect Sample
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    {% if order.status in ['sample_collected', 'completed'] %}
+                    <a href="{{ url_for('reports.preview_report', order_id=order.id) }}" class="btn btn-sm btn-info me-2" target="_blank">
+                        <i class="fas fa-eye me-1"></i> Preview Report
+                    </a>
+                    <a href="{{ url_for('reports.download_report', order_id=order.id) }}" class="btn btn-sm btn-success">
+                        <i class="fas fa-file-pdf me-1"></i> Download Report
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Test Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items %}
+                            <tr>
+                                <td>{{ item.test.test_name }}</td>
+                                <td>{{ item.test.category.name }}</td>
+                                <td>৳ {{ "%.2f"|format(item.price) }}</td>
+                                <td>
+                                    {% if item.result %}
+                                        <span class="text-success fw-bold">{{ item.result.result_text }}</span>
+                                    {% else %}
+                                        {% if current_user.role in ['admin', 'lab_tech'] and order.status != 'pending' %}
+                                            <a href="{{ url_for('frontend.enter_result', item_id=item.id) }}" class="btn btn-sm btn-outline-primary">Enter Result</a>
+                                        {% else %}
+                                            <span class="text-muted italic">Pending</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <th colspan="2" class="text-end">Total:</th>
+                                <th colspan="2">৳ {{ "%.2f"|format(order.items|sum(attribute='price')) }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ url_for('frontend.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    <a href="{{ url_for('frontend.orders_list') }}" class="btn btn-outline-secondary">Back to All Orders</a>
+</div>
+{% endblock %}

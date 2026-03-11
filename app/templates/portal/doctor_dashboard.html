@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Doctor's Portal - {{ doctor.name if doctor else current_user.username }}</h2>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card text-white bg-info shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Patients</h5>
+                            <h3 class="mb-0">{{ orders|length }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- Future enhancement: Commission summaries -->
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Referred Patients & Progress</h5>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Patient Name</th>
+                                    <th>Status</th>
+                                    <th>Tests</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ order.patient.name }}</td>
+                                    <td>
+                                        <span
+                                            class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-info{% endif %}">
+                                            {{ order.status|replace('_', ' ')|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% for item in order.items %}
+                                        <span class="badge bg-light text-dark border">{{ item.test.test_name }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% if order.status == 'completed' %}
+                                        <a href="{{ url_for('reports.download_report', order_id=order.id) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-alt"></i> View Report
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted small">In Progress</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <p class="text-muted">No referred patients found.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

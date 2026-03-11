@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Lab Work - Diagnostic Software{% endblock %}
+{% block page_title %}Pending Lab Work{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 bg-white">
+        <h6 class="m-0 font-weight-bold text-primary">Tests Awaiting Results</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle border">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Patient</th>
+                        <th>Tests Required</th>
+                        <th>Progress</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in orders %}
+                    <tr>
+                        <td class="fw-bold">ORD-{{ o.id }}</td>
+                        <td>{{ o.patient.name }}</td>
+                        <td>
+                            <ul class="list-unstyled mb-0">
+                                {% for item in o.items %}
+                                <li>
+                                    {% if item.result %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    {% else %}
+                                    <i class="far fa-circle text-warning"></i>
+                                    {% endif %}
+                                    {{ item.test.test_name }}
+
+                                    {% if not item.result %}
+                                    <a href="{{ url_for('frontend.enter_result', item_id=item.id) }}"
+                                        class="btn btn-sm btn-link py-0 px-2 fw-bold">Enter Result</a>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            {% set total = o.items|length %}
+                            {% set completed = o.items | selectattr('result') | list | length %}
+                            {% set pct = (completed / total * 100) | round if total > 0 else 0 %}
+
+                            <div class="progress" style="height: 15px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ pct }}%;"
+                                    aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100">{{ pct }}%</div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if completed == total %}
+                            <a href="{{ url_for('reports.download_report', order_id=o.id) }}"
+                                class="btn btn-sm btn-success"><i class="fas fa-file-pdf me-1"></i> Preview</a>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Processing</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No pending lab work right now.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

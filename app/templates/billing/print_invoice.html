@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice #{{ invoice.id }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f8f9fa; }
+        .invoice-container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 3px solid #007bff; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #007bff; margin: 0; font-size: 28px; }
+        .header h2 { color: #6c757d; margin: 5px 0 0 0; font-size: 18px; }
+        .invoice-info { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .invoice-details, .patient-details { flex: 1; }
+        .patient-details { margin-left: 30px; }
+        .section-title { color: #007bff; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #dee2e6; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #007bff; color: white; padding: 12px; text-align: left; }
+        td { padding: 10px 12px; border-bottom: 1px solid #dee2e6; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        .total-row { background: #e9ecef !important; font-weight: bold; font-size: 16px; }
+        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #dee2e6; color: #6c757d; }
+        .no-print { text-align: center; margin-top: 30px; }
+        .btn { padding: 10px 20px; margin: 0 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        @media print { 
+            body { background: white; }
+            .no-print { display: none; }
+            .invoice-container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="header">
+            <h1>DIAGNOSTIC CENTER</h1>
+            <h2>Medical Laboratory Services</h2>
+            <p style="margin: 10px 0 0 0; color: #6c757d;">Phone: +880-XXX-XXXXXX | Email: info@diagnostic.com</p>
+        </div>
+
+        <div class="invoice-info">
+            <div class="invoice-details">
+                <div class="section-title">Invoice Details</div>
+                <p><strong>Invoice No:</strong> INV-{{ invoice.id }}</p>
+                <p><strong>Date:</strong> {{ invoice.created_at.strftime('%d %B, %Y') }}</p>
+                <p><strong>Order ID:</strong> ORD-{{ invoice.order_id }}</p>
+                <p><strong>Status:</strong> 
+                    {% if invoice.payment_status == 'paid' %}
+                        <span style="color: #28a745; font-weight: bold;">PAID</span>
+                    {% elif invoice.payment_status == 'partial' %}
+                        <span style="color: #ffc107; font-weight: bold;">PARTIAL</span>
+                    {% else %}
+                        <span style="color: #dc3545; font-weight: bold;">UNPAID</span>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="patient-details">
+                <div class="section-title">Patient Information</div>
+                <p><strong>Name:</strong> {{ invoice.patient.name }}</p>
+                <p><strong>Code:</strong> {{ invoice.patient.patient_code }}</p>
+                <p><strong>Gender:</strong> {{ invoice.patient.gender }}</p>
+                <p><strong>Phone:</strong> {{ invoice.patient.phone }}</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60%;">Test Name</th>
+                    <th style="width: 20%; text-align: center;">Qty</th>
+                    <th style="width: 20%; text-align: right;">Amount (৳)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in invoice.items %}
+                <tr>
+                    <td>{{ item.test_name }}</td>
+                    <td style="text-align: center;">{{ item.quantity }}</td>
+                    <td style="text-align: right;">{{ "%.2f"|format(item.price) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="2" style="text-align: right; padding-right: 20px;">TOTAL AMOUNT:</td>
+                    <td style="text-align: right; font-size: 18px;">৳ {{ "%.2f"|format(invoice.total_amount) }}</td>
+                </tr>
+                {% if invoice.discount > 0 %}
+                <tr>
+                    <td colspan="2" style="text-align: right; padding-right: 20px;">Discount:</td>
+                    <td style="text-align: right; color: #28a745;">- ৳ {{ "%.2f"|format(invoice.discount) }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2" style="text-align: right; padding-right: 20px;">NET AMOUNT:</td>
+                    <td style="text-align: right; font-size: 18px;">৳ {{ "%.2f"|format(invoice.total_amount - invoice.discount) }}</td>
+                </tr>
+                {% endif %}
+            </tfoot>
+        </table>
+
+        <div class="footer">
+            <p><strong>Thank you for choosing our services!</strong></p>
+            <p>This is a computer generated invoice.</p>
+        </div>
+
+        <div class="no-print">
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Print Invoice</button>
+            <button class="btn btn-secondary" onclick="window.close()">✖️ Close</button>
+        </div>
+    </div>
+</body>
+</html>

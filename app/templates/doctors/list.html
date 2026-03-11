@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctors Management - Diagnostic Software{% endblock %}
+{% block page_title %}Doctors Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">All Doctors</h6>
+                <a href="{{ url_for('frontend.add_doctor_admin') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i>Add New Doctor
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Doctor Name</th>
+                                <th>Specialization</th>
+                                <th>Hospital</th>
+                                <th>Phone</th>
+                                <th>Commission Rate</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doctor in doctors %}
+                            <tr>
+                                <td>{{ doctor.id }}</td>
+                                <td>Dr. {{ doctor.doctor_name }}</td>
+                                <td>{{ doctor.specialization or 'General Physician' }}</td>
+                                <td>{{ doctor.hospital_name or '-' }}</td>
+                                <td>{{ doctor.phone or '-' }}</td>
+                                <td>{{ doctor.commission_rate }}%</td>
+                                <td>
+                                    {% if doctor.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">No doctors found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

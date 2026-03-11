@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing & Invoices - Diagnostic Software{% endblock %}
+{% block page_title %}Billing Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Unbilled Orders -->
+    <div class="col-md-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-warning">Pending Invoices</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Patient Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for po in pending_orders %}
+                            <tr>
+                                <td>ORD-{{ po.id }}</td>
+                                <td>{{ po.patient.name }}</td>
+                                <td>
+                                    <form action="{{ url_for('frontend.generate_invoice', order_id=po.id) }}"
+                                        method="POST">
+                                        <button type="submit" class="btn btn-sm btn-primary">Generate Bill</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No pending orders to bill.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Invoices -->
+    <div class="col-md-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-primary">All Invoices</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Inv ID</th>
+                                <th>Patient Name</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Print</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in invoices %}
+                            <tr>
+                                <td class="fw-bold">INV-{{ inv.id }}</td>
+                                <td>{{ inv.patient.name if inv.patient else 'Unknown' }}</td>
+                                <td>৳ {{ "%.2f"|format(inv.total_amount) }}</td>
+                                <td>
+                                    {% if inv.payment_status == 'paid' %}
+                                    <span class="badge bg-success">Paid</span>
+                                    {% elif inv.payment_status == 'partial' %}
+                                    <span class="badge bg-warning text-dark">Partial</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Unpaid</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('frontend.print_invoice', invoice_id=inv.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No invoices generated yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

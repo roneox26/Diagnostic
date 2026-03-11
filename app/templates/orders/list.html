@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Orders List - Diagnostic Software{% endblock %}
+{% block page_title %}Test Orders{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white">
+        <h6 class="m-0 font-weight-bold text-primary">All Bookings</h6>
+        <a href="{{ url_for('frontend.new_order') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Book New Test
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Patient Name</th>
+                        <th>Tests Count</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in orders %}
+                    <tr>
+                        <td class="fw-bold">ORD-{{ o.id }}</td>
+                        <td>{{ o.patient.name }} <br><small class="text-muted">{{ o.patient.patient_code }}</small></td>
+                        <td><span class="badge bg-info text-dark">{{ o.items|length }}</span></td>
+                        <td>{{ o.order_date.strftime('%Y-%m-%d %I:%M %p') }}</td>
+                        <td>
+                            {% if o.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending Sample</span>
+                            {% elif o.status == 'sample_collected' %}
+                            <span class="badge bg-primary">In Lab</span>
+                            {% elif o.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ o.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('frontend.view_order', order_id=o.id) }}" class="btn btn-sm btn-info text-white" title="View Details"><i
+                                    class="fas fa-eye"></i></a>
+                            {% if o.status == 'pending' %}
+                            <form action="{{ url_for('frontend.collect_sample', order_id=o.id) }}" method="POST"
+                                class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-warning" title="Collect Sample">
+                                    <i class="fas fa-syringe"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                            {% if o.status == 'completed' or o.status == 'sample_collected' %}
+                            <a href="{{ url_for('reports.download_report', order_id=o.id) }}"
+                                class="btn btn-sm btn-success" title="Generate Report"><i
+                                    class="fas fa-file-pdf"></i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No orders found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

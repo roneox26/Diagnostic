@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnostic Report - ORD-{{ order.id }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #0056b3;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+
+        .patient-info {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .patient-info td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .patient-info .label {
+            font-weight: bold;
+            background-color: #f9f9f9;
+            width: 20%;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .results-table th {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: right;
+        }
+
+        .signature-line {
+            width: 200px;
+            border-top: 1px solid #333;
+            display: inline-block;
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>DiagnosticPro Center</h1>
+        <p>123 Health Avenue, Medical District, City</p>
+        <p>Phone: +1 234 567 8900 | Email: reports@diagnosticpro.com</p>
+    </div>
+
+    <h3>Patient Information</h3>
+    <table class="patient-info">
+        <tr>
+            <td class="label">Patient Name:</td>
+            <td>{{ patient.name }}</td>
+            <td class="label">Patient ID:</td>
+            <td>{{ patient.patient_code }}</td>
+        </tr>
+        <tr>
+            <td class="label">Age/Gender:</td>
+            <td>{{ patient.gender }}</td>
+            <td class="label">Order ID:</td>
+            <td>ORD-{{ order.id }}</td>
+        </tr>
+        <tr>
+            <td class="label">Report Date:</td>
+            <td colspan="3">{{ date_generated }}</td>
+        </tr>
+    </table>
+
+    <h3>Laboratory Results</h3>
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th>Test Name</th>
+                <th>Result</th>
+                <th>Technician</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td><strong>{{ item.test.test_name }}</strong><br><small>{{ item.test.category.name if
+                        item.test.category else '' }}</small></td>
+                <td>{{ item.result.result_text }}</td>
+                <td>User #{{ item.result.technician_id }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" style="text-align: center;">No completed results available yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <div style="float: left; text-align: left;">
+            {% if qr_code %}
+            <img src="file:///{{ qr_code }}" style="width: 100px; height: 100px;">
+            <br><small>Scan to verify report</small>
+            {% endif %}
+        </div>
+        <div class="signature-line">
+            <strong>Authorized Signature</strong><br>
+            Chief Pathologist
+        </div>
+    </div>
+</body>
+
+</html>

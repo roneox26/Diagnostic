@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Confirmed - MedCare Diagnostic</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: #f8f9fa; }
+        .confirmation-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .success-header { background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; padding: 40px; border-radius: 15px 15px 0 0; text-align: center; }
+        .appointment-details { padding: 40px; }
+        .detail-item { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="confirmation-card">
+                    <div class="success-header">
+                        <i class="fas fa-check-circle fa-4x mb-3"></i>
+                        <h2>Appointment Confirmed!</h2>
+                        <p class="mb-0">Your appointment has been successfully booked</p>
+                    </div>
+                    
+                    <div class="appointment-details">
+                        <h5 class="text-primary mb-4">Appointment Details</h5>
+                        
+                        <div class="detail-item">
+                            <strong>Appointment ID:</strong> #{{ appointment.id }}
+                        </div>
+                        
+                        <div class="detail-item">
+                            <strong>Patient Name:</strong> {{ appointment.patient_name }}
+                        </div>
+                        
+                        <div class="detail-item">
+                            <strong>Doctor:</strong> Dr. {{ appointment.doctor.doctor_name }}
+                        </div>
+                        
+                        <div class="detail-item">
+                            <strong>Date:</strong> {{ appointment.appointment_date.strftime('%d %B, %Y') }}
+                        </div>
+                        
+                        <div class="detail-item">
+                            <strong>Time:</strong> {{ appointment.appointment_time.strftime('%I:%M %p') }}
+                        </div>
+                        
+                        <div class="detail-item">
+                            <strong>Status:</strong> 
+                            <span class="badge bg-success">{{ appointment.status.title() }}</span>
+                        </div>
+
+                        <div class="alert alert-info mt-4">
+                            <h6><i class="fas fa-info-circle me-2"></i>Important Instructions:</h6>
+                            <ul class="mb-0">
+                                <li>Please arrive 15 minutes before your appointment time</li>
+                                <li>Bring a valid ID and any previous medical records</li>
+                                <li>Contact us at +880-1234-567890 for any changes</li>
+                            </ul>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('frontend.index') }}" class="btn btn-primary me-3">
+                                <i class="fas fa-home me-2"></i>Back to Home
+                            </a>
+                            <button onclick="window.print()" class="btn btn-outline-success">
+                                <i class="fas fa-print me-2"></i>Print Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
