@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from app.config import config
 from app.extensions import db, migrate, jwt, bcrypt, cors, mail

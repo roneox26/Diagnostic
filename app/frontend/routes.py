@@ -12,34 +12,40 @@ def index():
         return redirect(url_for('frontend.dashboard'))
         
     # Fetch stats
-    total_patients = Patient.query.count()
-    total_tests = Test.query.count()
-    
-    # Format large numbers for UI
+    try:
+        total_patients = Patient.query.count()
+        total_tests = Test.query.count()
+    except Exception:
+        total_patients = 0
+        total_tests = 0
+
     def format_count(count):
         if count >= 1000:
             return f"{count // 1000}K+"
         return f"{count}+"
-        
+
     stats = {
         'patients': format_count(total_patients),
         'tests': format_count(total_tests)
     }
     
     # Fetch settings
-    settings_db = SiteSetting.query.all()
-    settings = {s.key: s.value for s in settings_db}
-    
-    # Fallbacks if DB is empty
+    try:
+        settings_db = SiteSetting.query.all()
+        settings = {s.key: s.value for s in settings_db}
+        testimonials = Testimonial.query.filter_by(is_active=True).all()
+        corp_partners = Partner.query.filter_by(is_active=True, partner_type='corporate').all()
+        service_partners = Partner.query.filter_by(is_active=True, partner_type='service').all()
+    except Exception:
+        settings = {}
+        testimonials = []
+        corp_partners = []
+        service_partners = []
+
     settings.setdefault('contact_phone', '+880-1234-567890')
     settings.setdefault('contact_email', 'info@medcare.com')
     settings.setdefault('address', '123 Medical Plaza, Healthcare District\nDhaka - 1205, Bangladesh')
     settings.setdefault('years_experience', '15+')
-    
-    # Fetch active testimonials and partners
-    testimonials = Testimonial.query.filter_by(is_active=True).all()
-    corp_partners = Partner.query.filter_by(is_active=True, partner_type='corporate').all()
-    service_partners = Partner.query.filter_by(is_active=True, partner_type='service').all()
     
     return render_template('public_home.html', 
                            stats=stats,

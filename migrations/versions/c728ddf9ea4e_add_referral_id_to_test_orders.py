@@ -27,7 +27,11 @@ def upgrade():
     sa.ForeignKeyConstraint(['test_id'], ['tests.id'], name=op.f('fk_test_reagent_consumption_test_id_tests')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_test_reagent_consumption'))
     )
-    op.drop_table('_alembic_tmp_patients')
+    # Drop temp table only if it exists (safe for fresh deploys)
+    conn = op.get_bind()
+    inspector = sa.inspect(conn)
+    if '_alembic_tmp_patients' in inspector.get_table_names():
+        op.drop_table('_alembic_tmp_patients')
     with op.batch_alter_table('inventory_items', schema=None) as batch_op:
         batch_op.add_column(sa.Column('low_stock_threshold', sa.Integer(), nullable=True))
 

@@ -12,8 +12,8 @@ def referrals_list():
     doctors = ReferralDoctor.query.all()
     # Calculate some basic stats
     for doc in doctors:
-        doc.total_commissions = sum(c.commission_amount for c in doc.commissions)
-        doc.pending_commissions = sum(c.commission_amount for c in doc.commissions if c.status == 'pending')
+        doc.total_commissions = sum(c.amount for c in doc.commissions)
+        doc.pending_commissions = sum(c.amount for c in doc.commissions if c.status == 'pending')
         
     return render_template('referrals/list.html', doctors=doctors)
 
@@ -52,5 +52,5 @@ def pay_commission(doctor_id):
         c.status = 'paid'
         
     db.session.commit()
-    flash(f'Paid pending commissions for Dr. {doc.name}', 'success')
+    flash(f'Paid pending commissions for Dr. {doc.doctor_name}', 'success')
     return redirect(url_for('frontend.referrals_list'))

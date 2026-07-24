@@ -35,7 +35,7 @@ def public_report_access():
                 ).order_by(TestOrder.order_date.desc()).first()
                 
         if order:
-            # Clean both phone numbers for comparison
+            # Verify phone matches
             order_phone = ''.join(filter(str.isdigit, order.patient.phone or ''))
                 
         if not order or (''.join(filter(str.isdigit, order.patient.phone or '')) != phone):
@@ -50,6 +50,15 @@ def public_report_access():
         return redirect(url_for('portal.public_preview_report', order_id=order.id))
         
     return render_template('portal/report_access.html')
+
+@bp_portal.route('/report-preview/<int:order_id>')
+def public_preview_report(order_id):
+    order = TestOrder.query.get_or_404(order_id)
+    if order.status != 'completed':
+        flash('Report is not ready yet.', 'warning')
+        return redirect(url_for('portal.public_report_access'))
+    items = [item for item in order.items if item.result]
+    return render_template('portal/public_report_preview.html', order=order, patient=order.patient, items=items)
 
 @bp_portal.route('/portal/patient')
 @login_required
