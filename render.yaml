@@ -2,10 +2,12 @@ services:
   - type: web
     name: diagnostic
     env: python
-    buildCommand: "pip install -r requirements.txt && flask db upgrade"
+    buildCommand: "bash build.sh"
     startCommand: "gunicorn run:app --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: FLASK_ENV
         value: production
+      - key: FLASK_APP
+        value: run.py
