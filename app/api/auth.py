@@ -6,7 +6,16 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 
 @bp.route('/auth/register', methods=['POST'])
 def register_admin():
-    # Helper to register first admin. Should be disabled in production or secured.
+    # Helper to register first admin. Should be secured.
+    if User.query.count() > 0:
+        from flask_jwt_extended import verify_jwt_in_request, get_jwt
+        try:
+            verify_jwt_in_request()
+            if get_jwt().get('role') != 'admin':
+                return jsonify({'error': 'Unauthorized: Admin access required'}), 403
+        except Exception as e:
+            return jsonify({'error': 'Unauthorized: Valid token required'}), 401
+            
     data = request.get_json()
     
     if User.query.filter_by(username=data['username']).first():

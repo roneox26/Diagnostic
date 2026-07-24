@@ -84,10 +84,8 @@ def add_doctor_admin():
         try:
             doctor = ReferralDoctor(
                 doctor_name=request.form.get('doctor_name'),
-                name=request.form.get('doctor_name'),
                 specialization=request.form.get('specialization'),
                 hospital_name=request.form.get('hospital_name'),
-                hospital=request.form.get('hospital_name'),
                 phone=request.form.get('phone'),
                 commission_rate=float(request.form.get('commission_rate', 0)),
                 is_active=True
@@ -112,7 +110,7 @@ def appointments_admin():
     appointments = Appointment.query.order_by(Appointment.appointment_date.desc()).all()
     return render_template('appointments/admin_list.html', appointments=appointments)
 
-@bp.route('/appointments/update-status/<int:appointment_id>/<status>')
+@bp.route('/appointments/update-status/<int:appointment_id>/<status>', methods=['POST'])
 @login_required
 @role_required('admin', 'receptionist')
 def update_appointment_status(appointment_id, status):

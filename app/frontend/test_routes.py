@@ -15,6 +15,7 @@ def tests_list():
 
 @bp.route('/tests/add', methods=['POST'])
 @login_required
+@role_required('admin')
 def add_test():
     test_name = request.form.get('test_name')
     category_id = request.form.get('category_id')
@@ -38,6 +39,7 @@ def add_test():
 
 @bp.route('/categories/add', methods=['POST'])
 @login_required
+@role_required('admin')
 def add_category():
     name = request.form.get('name')
     if name:

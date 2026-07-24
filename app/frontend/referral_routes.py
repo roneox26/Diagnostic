@@ -28,8 +28,8 @@ def add_doctor():
     
     if name:
         doc = ReferralDoctor(
-            name=name,
-            hospital=hospital,
+            doctor_name=name,
+            hospital_name=hospital,
             phone=phone,
             commission_rate=commission_rate or 0.0
         )

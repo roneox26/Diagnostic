@@ -4,6 +4,7 @@ from app.extensions import db
 from app.models import Patient
 from flask_jwt_extended import jwt_required
 from app.api.decorators import role_required
+import uuid
 
 @bp.route('/patients', methods=['GET'])
 @jwt_required()
@@ -28,10 +29,8 @@ def get_patients():
 def register_patient():
     data = request.get_json()
     
-    # Simple code generator
-    last_patient = Patient.query.order_by(Patient.id.desc()).first()
-    new_id = last_patient.id + 1 if last_patient else 1
-    p_code = f"PT-{new_id:04d}"
+    # Simple code generator using UUID to avoid race conditions
+    p_code = f"PT-{uuid.uuid4().hex[:6].upper()}"
     
     patient = Patient(
         patient_code=p_code,

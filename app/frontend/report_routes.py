@@ -25,6 +25,19 @@ def preview_report(order_id):
 def public_download_report(order_id):
     order = TestOrder.query.get_or_404(order_id)
     
+    # Require phone number verification via query param for public access
+    phone = request.args.get('phone')
+    if not phone:
+        flash("Verification required to download report.", "danger")
+        return redirect(url_for('portal.public_report_access'))
+        
+    order_phone = ''.join(filter(str.isdigit, order.patient.phone or ''))
+    provided_phone = ''.join(filter(str.isdigit, phone))
+    
+    if order_phone != provided_phone:
+        flash("Verification failed.", "danger")
+        return redirect(url_for('portal.public_report_access'))
+    
     # Check if any results are entered
     has_results = any(item.result for item in order.items)
     if not has_results:

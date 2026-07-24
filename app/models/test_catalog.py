@@ -14,6 +14,7 @@ class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey('test_categories.id'), nullable=False)
     test_name = db.Column(db.String(200), nullable=False)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
     sample_type = db.Column(db.String(50)) # Blood, Urine, etc.
+    reference_range = db.Column(db.String(255))
     description = db.Column(db.Text)

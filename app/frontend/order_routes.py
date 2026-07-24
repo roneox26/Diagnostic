@@ -16,6 +16,7 @@ def orders_list():
 
 @bp.route('/orders/new', methods=['GET', 'POST'])
 @login_required
+@role_required('admin', 'receptionist')
 def new_order():
     if request.method == 'POST':
         patient_id = request.form.get('patient_id')

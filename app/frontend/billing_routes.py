@@ -24,6 +24,7 @@ def print_invoice(invoice_id):
 
 @bp.route('/billing/create/<int:order_id>', methods=['POST'])
 @login_required
+@role_required('admin', 'receptionist')
 def generate_invoice(order_id):
     order = TestOrder.query.get_or_404(order_id)
     

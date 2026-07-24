@@ -48,21 +48,25 @@
                                 <td>
                                     <div class="btn-group" role="group">
                                         {% if appointment.status == 'pending' %}
-                                        <a href="{{ url_for('frontend.update_appointment_status', appointment_id=appointment.id, status='confirmed') }}" 
-                                           class="btn btn-sm btn-success">
-                                            <i class="fas fa-check"></i>
-                                        </a>
+                                        <form action="{{ url_for('frontend.update_appointment_status', appointment_id=appointment.id, status='confirmed') }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Confirm">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
                                         {% endif %}
                                         
-                                        {% if appointment.status in ['pending', 'confirmed'] %}
-                                        <a href="{{ url_for('frontend.update_appointment_status', appointment_id=appointment.id, status='completed') }}" 
-                                           class="btn btn-sm btn-info">
-                                            <i class="fas fa-check-double"></i>
-                                        </a>
-                                        <a href="{{ url_for('frontend.update_appointment_status', appointment_id=appointment.id, status='cancelled') }}" 
-                                           class="btn btn-sm btn-danger">
-                                            <i class="fas fa-times"></i>
-                                        </a>
+                                        {% if appointment.status != 'completed' and appointment.status != 'cancelled' %}
+                                        <form action="{{ url_for('frontend.update_appointment_status', appointment_id=appointment.id, status='completed') }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-info" title="Mark Completed">
+                                                <i class="fas fa-flag-checkered"></i>
+                                            </button>
+                                        </form>
+                                        
+                                        <form action="{{ url_for('frontend.update_appointment_status', appointment_id=appointment.id, status='cancelled') }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel" onclick="return confirm('Cancel this appointment?');">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
                                         {% endif %}
                                     </div>
                                 </td>

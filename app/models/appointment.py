@@ -1,5 +1,5 @@
 from app.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 
 class DoctorSchedule(db.Model):
     __tablename__ = 'doctor_schedules'
@@ -25,6 +25,6 @@ class Appointment(db.Model):
     appointment_time = db.Column(db.Time, nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, confirmed, cancelled, completed
     notes = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     doctor = db.relationship('ReferralDoctor', backref='appointments', lazy=True)

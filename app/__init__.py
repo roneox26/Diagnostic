@@ -5,6 +5,10 @@ from app.extensions import db, migrate, jwt, bcrypt, cors, mail
 def create_app(config_name='default'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+    
+    if config_name == 'production':
+        if not os.environ.get('SECRET_KEY') or not os.environ.get('JWT_SECRET_KEY'):
+            raise ValueError("SECRET_KEY and JWT_SECRET_KEY must be set in production environment variables")
 
     # Initialize extensions
     db.init_app(app)

@@ -12,7 +12,8 @@ class Config:
     # Mail Settings
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is None or os.environ.get('MAIL_USE_TLS').lower() == 'true'
+    _tls = os.environ.get('MAIL_USE_TLS')
+    MAIL_USE_TLS = True if _tls is None else str(_tls).lower() == 'true'
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'noreply@diagnosticpro.com'

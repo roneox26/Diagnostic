@@ -1,5 +1,5 @@
 from app.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class TestOrder(db.Model):
@@ -8,8 +8,8 @@ class TestOrder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), nullable=False)
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)
-    status = db.Column(db.String(30), default='pending') # pending, sample_collected, processing, completed
+    order_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    status = db.Column(db.String(30), default='pending', index=True) # pending, sample_collected, processing, completed
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) # receptionist who created it
     referral_id = db.Column(db.Integer, db.ForeignKey('referral_doctors.id'), nullable=True)
     
@@ -25,7 +25,7 @@ class TestOrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('test_orders.id'), nullable=False)
     test_id = db.Column(db.Integer, db.ForeignKey('tests.id'), nullable=False)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False) # Store historical price at time of order
     
     test = db.relationship('Test', lazy=True)
     result = db.relationship('TestResult', backref='order_item', uselist=False, lazy=True)

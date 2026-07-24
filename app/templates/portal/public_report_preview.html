@@ -113,8 +113,8 @@
                 <a href="{{ url_for('portal.public_report_access') }}" class="btn btn-back">
                     <i class="fas fa-arrow-left me-2"></i>Back to Search
                 </a>
-                <a href="{{ url_for('reports.public_download_report', order_id=order.id) }}" class="btn btn-download">
-                    <i class="fas fa-download me-2"></i>Download PDF Report
+                <a href="{{ url_for('reports.public_download_report', order_id=order.id, phone=patient.phone) }}" class="btn btn-primary me-2">
+                    <i class="fas fa-download"></i> Download PDF
                 </a>
                 <button onclick="window.print()" class="btn btn-outline-success">
                     <i class="fas fa-print me-2"></i>Print Report
