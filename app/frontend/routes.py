@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request
 from app.frontend import bp
-from app.models import User, Patient, TestOrder, ReferralDoctor, Appointment
+from app.models import User, Patient, TestOrder, ReferralDoctor, Appointment, Test, TestCategory, Sample
+from app.models.cms import SiteSetting, Testimonial, Partner
 from flask_login import login_user, logout_user, login_required, current_user
 from app.extensions import bcrypt, db
 from app.frontend.decorators import role_required
@@ -9,7 +10,43 @@ from app.frontend.decorators import role_required
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('frontend.dashboard'))
-    return render_template('public_home.html')
+        
+    # Fetch stats
+    total_patients = Patient.query.count()
+    total_tests = Test.query.count()
+    
+    # Format large numbers for UI
+    def format_count(count):
+        if count >= 1000:
+            return f"{count // 1000}K+"
+        return f"{count}+"
+        
+    stats = {
+        'patients': format_count(total_patients),
+        'tests': format_count(total_tests)
+    }
+    
+    # Fetch settings
+    settings_db = SiteSetting.query.all()
+    settings = {s.key: s.value for s in settings_db}
+    
+    # Fallbacks if DB is empty
+    settings.setdefault('contact_phone', '+880-1234-567890')
+    settings.setdefault('contact_email', 'info@medcare.com')
+    settings.setdefault('address', '123 Medical Plaza, Healthcare District\nDhaka - 1205, Bangladesh')
+    settings.setdefault('years_experience', '15+')
+    
+    # Fetch active testimonials and partners
+    testimonials = Testimonial.query.filter_by(is_active=True).all()
+    corp_partners = Partner.query.filter_by(is_active=True, partner_type='corporate').all()
+    service_partners = Partner.query.filter_by(is_active=True, partner_type='service').all()
+    
+    return render_template('public_home.html', 
+                           stats=stats,
+                           settings=settings,
+                           testimonials=testimonials,
+                           corp_partners=corp_partners,
+                           service_partners=service_partners)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():

@@ -8,3 +8,4 @@ from .billing import Invoice, InvoiceItem
 from .referral import ReferralDoctor, ReferralCommission
 from .inventory import InventoryItem, TestReagentConsumption
 from .appointment import DoctorSchedule, Appointment
+from .cms import SiteSetting, Testimonial, Partner
